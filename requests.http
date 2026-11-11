@@ -1,0 +1,56 @@
+@api = http://localhost:5000
+
+### 1. Kiểm tra server đang chạy (200 OK)
+GET {{api}}/
+
+### 2. Lấy danh sách bài tập (200 OK)
+GET {{api}}/api/assignments
+
+### 3. Lấy chi tiết bài tập tồn tại (200 OK)
+GET {{api}}/api/assignments/1
+
+### 4. Lấy chi tiết bài tập không tồn tại (404 Not Found)
+GET {{api}}/api/assignments/999
+
+### 5. Nộp bài hợp lệ cho Bài 1 (201 Created)
+# @name createSubmission
+POST {{api}}/api/assignments/1/submissions
+Content-Type: application/json
+
+{
+  "studentCode": "SV001",
+  "repositoryUrl": "https://github.com/sv001/ptudpt-lab"
+}
+
+### 6. Đọc lại lượt nộp vừa tạo từ ID thu được ở bước 5 (200 OK)
+GET {{api}}/api/submissions/{{createSubmission.response.body.$.id}}
+
+### 7. Thử nộp trùng bài cho bài 1 (409 Conflict)
+POST {{api}}/api/assignments/1/submissions
+Content-Type: application/json
+
+{
+  "studentCode": "SV001",
+  "repositoryUrl": "https://github.com/sv001/ptudpt-lab"
+}
+
+### 8. Thử nộp cho bài tập đã đóng (400 Bad Request - ASSIGNMENT_CLOSED)
+POST {{api}}/api/assignments/3/submissions
+Content-Type: application/json
+
+{
+  "studentCode": "SV002",
+  "repositoryUrl": "https://github.com/sv002/lab"
+}
+
+### 9. Thử nộp dữ liệu rỗng (400 Bad Request - INVALID_SUBMISSION)
+POST {{api}}/api/assignments/1/submissions
+Content-Type: application/json
+
+{
+  "studentCode": "",
+  "repositoryUrl": ""
+}
+
+### 10. Hủy lượt nộp bài vừa tạo (204 No Content)
+DELETE {{api}}/api/submissions/{{createSubmission.response.body.$.id}}
